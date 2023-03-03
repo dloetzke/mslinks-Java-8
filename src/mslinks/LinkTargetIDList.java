@@ -42,7 +42,7 @@ public class LinkTargetIDList extends LinkedList<ItemID> implements Serializable
 				break;
 
 			int typeFlags = data.read();
-			var item = ItemID.createItem(typeFlags);
+			ItemID item = ItemID.createItem(typeFlags);
 			item.load(data, itemSize - 3);
 			add(item);
 		}
@@ -77,7 +77,7 @@ public class LinkTargetIDList extends LinkedList<ItemID> implements Serializable
 	/**
 	 * @Deprecated Equivalent of {@link #canBuildPath()} method
 	 */
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	public boolean isCorrect() {
 		return canBuildPath();
 	}
@@ -93,23 +93,23 @@ public class LinkTargetIDList extends LinkedList<ItemID> implements Serializable
 		if (size() < 2)
 			return false;
 
-		var firstId = getFirst();
+		ItemID firstId = getFirst();
 		if (!(firstId instanceof ItemIDRoot))
 			return false;
 		
-		var rootId = (ItemIDRoot) firstId;
+		ItemIDRoot rootId = (ItemIDRoot) firstId;
 		if (!rootId.getClsid().equals(Registry.CLSID_COMPUTER))
 			return false;
 
-		var secondId = get(1);
+		ItemID secondId = get(1);
 		return secondId instanceof ItemIDDrive;
 	}
 
 	public String buildPath() {
-		var path = new StringBuilder();
+		StringBuilder path = new StringBuilder();
 		if (!isEmpty()) {
 			// when a link created by drag'n'drop menu from desktop, id list starts from filename directly
-			var firstId = getFirst();
+			ItemID firstId = getFirst();
 			if (firstId instanceof ItemIDFS)
 				path.append("<Desktop>\\");
 

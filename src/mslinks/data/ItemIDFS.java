@@ -128,7 +128,7 @@ public class ItemIDFS extends ItemID {
 		}
 
 		int offsetInDataChunk = hiddenOffset - bytesParsed;
-		var hbr = new ByteReader(new ByteArrayInputStream(dataChunk, offsetInDataChunk, dataChunk.length));
+		ByteReader hbr = new ByteReader(new ByteArrayInputStream(dataChunk, offsetInDataChunk, dataChunk.length));
 		loadHiddenPart(hbr, dataChunk.length + 2 - offsetInDataChunk);
 	}
 

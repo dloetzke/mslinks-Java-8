@@ -19,7 +19,13 @@ import org.junit.Test;
 import io.ByteReader;
 import mslinks.data.CNRLink;
 import mslinks.data.VolumeID;
+import mslinks.data.LinkFlags;
+import mslinks.data.FileAttributesFlags;
+import mslinks.data.ConsoleFlags;
+import mslinks.extra.EnvironmentVariable;
 import mslinks.extra.ConsoleData;
+import mslinks.extra.Tracker;
+import mslinks.extra.VistaIDList;
 
 import static org.junit.Assert.*;
 
@@ -29,7 +35,7 @@ import java.nio.charset.Charset;
 
 public class ReadTests {
 	private ShellLink createLink(byte[] data) throws IOException, ShellLinkException {
-		var reader = new ByteReader(new ByteArrayInputStream(data));
+		ByteReader reader = new ByteReader(new ByteArrayInputStream(data));
 		reader.setLittleEndian();
 		return new ShellLink(reader);
 	}
@@ -40,7 +46,7 @@ public class ReadTests {
 
 	@Test
 	public void TestLinkProperties() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.consolelink);
+		ShellLink link = createLink(ReadTestData.consolelink);
 
 		String expectedTarget = "C:\\linktest\\folder\\pause.bat";
 
@@ -56,8 +62,8 @@ public class ReadTests {
 
 	@Test
 	public void TestLinkHeaderProperties() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.consolelink);
-		var header = link.getHeader();
+		ShellLink link = createLink(ReadTestData.consolelink);
+		ShellLinkHeader header = link.getHeader();
 
 		assertEquals(ShellLinkHeader.SW_SHOWNORMAL, header.getShowCommand());
 		assertEquals(128, header.getIconIndex());
@@ -69,8 +75,8 @@ public class ReadTests {
 
 	@Test
 	public void TestLinkFlags() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.consolelink);
-		var flags = link.getHeader().getLinkFlags();
+		ShellLink link = createLink(ReadTestData.consolelink);
+		LinkFlags flags = link.getHeader().getLinkFlags();
 
 		assertTrue(flags.hasLinkTargetIDList());
 		assertTrue(flags.hasLinkInfo());
@@ -101,8 +107,8 @@ public class ReadTests {
 
 	@Test
 	public void TestFileAttributesFlags() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.consolelink);
-		var flags = link.getHeader().getFileAttributesFlags();
+		ShellLink link = createLink(ReadTestData.consolelink);
+		FileAttributesFlags flags = link.getHeader().getFileAttributesFlags();
 
 		assertFalse(flags.isReadonly());
 		assertFalse(flags.isHidden());
@@ -121,15 +127,15 @@ public class ReadTests {
 
 	@Test
 	public void TestLinkInfo() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.consolelink);
-		var linkInfo = link.getLinkInfo();
+		ShellLink link = createLink(ReadTestData.consolelink);
+		LinkInfo linkInfo = link.getLinkInfo();
 
 		assertEquals("C:\\linktest\\folder\\pause.bat", linkInfo.buildPath());
 		assertEquals("C:\\linktest\\folder\\pause.bat", linkInfo.getLocalBasePath());
 		assertEquals(null, linkInfo.getCommonPathSuffix());
 		assertNull(linkInfo.getCommonNetworkRelativeLink());
 
-		var vid = linkInfo.getVolumeID();
+		VolumeID vid = linkInfo.getVolumeID();
 		assertEquals(VolumeID.DRIVE_FIXED, vid.getDriveType());
 		assertEquals(-159486725, vid.getSerialNumber());
 		assertEquals("", vid.getLabel());
@@ -141,8 +147,8 @@ public class ReadTests {
 
 	@Test
 	public void TestConsoleProperties() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.consolelink);
-		var consoleData = link.getConsoleData();
+		ShellLink link = createLink(ReadTestData.consolelink);
+		ConsoleData consoleData = link.getConsoleData();
 
 		int[] colors = {
 			ConsoleData.rgb(12, 12, 12),
@@ -183,7 +189,7 @@ public class ReadTests {
 		assertEquals(50, consoleData.getHistorySize());
 		assertEquals(4, consoleData.getHistoryBuffers());
 
-		var flags = consoleData.getConsoleFlags();
+		ConsoleFlags flags = consoleData.getConsoleFlags();
 		assertFalse(flags.isBoldFont());
 		assertFalse(flags.isFullscreen());
 		assertTrue(flags.isQuickEdit());
@@ -194,15 +200,15 @@ public class ReadTests {
 
 	@Test
 	public void TestExtras() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.consolelink);
+		ShellLink link = createLink(ReadTestData.consolelink);
 		
-		var env = link.getEnvironmentVariable();
+		EnvironmentVariable env = link.getEnvironmentVariable();
 		assertEquals("", env.getVariable());
 
-		var tracker = link.getTracker();
+		Tracker tracker = link.getTracker();
 		assertEquals("desktop-4c56d9j", tracker.getNetbiosName());
 
-		var vista = link.getVistaIDList();
+		VistaIDList vista = link.getVistaIDList();
 		assertEquals("", vista.toString());
 	}
 
@@ -212,14 +218,14 @@ public class ReadTests {
 
 	@Test
 	public void TestRunAsAdmin() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.consolelink_admin);
-		var flags = link.getHeader().getLinkFlags();
+		ShellLink link = createLink(ReadTestData.consolelink_admin);
+		LinkFlags flags = link.getHeader().getLinkFlags();
 		assertTrue(flags.runAsUser());
 	}
 
 	@Test
 	public void TestExeLinkProperties() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.exelink);
+		ShellLink link = createLink(ReadTestData.exelink);
 
 		String expectedTarget = "C:\\Program Files\\7-Zip\\7zFM.exe";
 
@@ -233,7 +239,7 @@ public class ReadTests {
 
 	@Test
 	public void TestMediaFileLinkProperties() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.textfilelink);
+		ShellLink link = createLink(ReadTestData.textfilelink);
 
 		String expectedTarget = "C:\\linktest\\folder\\textfile.txt";
 
@@ -247,7 +253,7 @@ public class ReadTests {
 
 	@Test
 	public void TestUnicodePath() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.unicodetest);
+		ShellLink link = createLink(ReadTestData.unicodetest);
 
 		String expectedTarget = "C:\\linktest\\folder\\\u03B1\u03B1\u03B1.txt";
 
@@ -258,9 +264,9 @@ public class ReadTests {
 
 	@Test
 	public void TestNetworkSharePath() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.sharedfilelink);
-		var header = link.getHeader();
-		var linkInfo = link.getLinkInfo();
+		ShellLink link = createLink(ReadTestData.sharedfilelink);
+		ShellLinkHeader header = link.getHeader();
+		LinkInfo linkInfo = link.getLinkInfo();
 
 		String expectedTarget = "\\\\LAPTOP\\SHARE\\testfile.txt";
 
@@ -276,14 +282,14 @@ public class ReadTests {
 
 	@Test
 	public void TestNetworkShareLinkProperties() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.sharedfilelink);
-		var linkInfo = link.getLinkInfo();
+		ShellLink link = createLink(ReadTestData.sharedfilelink);
+		LinkInfo linkInfo = link.getLinkInfo();
 
 		assertNull(linkInfo.getVolumeID());
 		assertEquals(null, linkInfo.getLocalBasePath());
 		assertEquals("testfile.txt", linkInfo.getCommonPathSuffix());
 
-		var netLink = linkInfo.getCommonNetworkRelativeLink();
+		CNRLink netLink = linkInfo.getCommonNetworkRelativeLink();
 		assertNotNull(netLink);
 		assertEquals(CNRLink.WNNC_NET_DECORB, netLink.getNetworkType());
 		assertEquals("\\\\LAPTOP\\SHARE", netLink.getNetName());
@@ -292,7 +298,7 @@ public class ReadTests {
 
 	@Test
 	public void TestNetworkDrivePath() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.networkdrivefilelink);
+		ShellLink link = createLink(ReadTestData.networkdrivefilelink);
 
 		String expectedTarget = "Z:\\testfile.txt";
 
@@ -303,8 +309,8 @@ public class ReadTests {
 
 	@Test
 	public void TestNetworkDriveLinkProperties() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.networkdrivefilelink);
-		var linkInfo = link.getLinkInfo();
+		ShellLink link = createLink(ReadTestData.networkdrivefilelink);
+		LinkInfo linkInfo = link.getLinkInfo();
 
 		String expectedTarget = "\\\\laptop\\share\\testfile.txt";
 
@@ -313,7 +319,7 @@ public class ReadTests {
 		assertEquals("testfile.txt", linkInfo.getCommonPathSuffix());
 		assertEquals(expectedTarget, linkInfo.buildPath());
 
-		var netLink = linkInfo.getCommonNetworkRelativeLink();
+		CNRLink netLink = linkInfo.getCommonNetworkRelativeLink();
 		assertNotNull(netLink);
 		assertEquals(CNRLink.WNNC_NET_DECORB, netLink.getNetworkType());
 		assertEquals("\\\\laptop\\share", netLink.getNetName());
@@ -322,9 +328,9 @@ public class ReadTests {
 
 	@Test
 	public void TestNetworkShareUnicodePath() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.sharedunicodelink);
-		var header = link.getHeader();
-		var linkInfo = link.getLinkInfo();
+		ShellLink link = createLink(ReadTestData.sharedunicodelink);
+		ShellLinkHeader header = link.getHeader();
+		LinkInfo linkInfo = link.getLinkInfo();
 
 		String expectedTarget = "\\\\LAPTOP\\\u0391\u0391\u0391\\\u03B1\u03B1\u03B1.txt";
 
@@ -340,7 +346,7 @@ public class ReadTests {
 
 	@Test
 	public void TestDirectoryLink() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.directorylink);
+		ShellLink link = createLink(ReadTestData.directorylink);
 
 		String expectedTarget = "C:\\linktest\\folder\\";
 
@@ -352,7 +358,7 @@ public class ReadTests {
 
 	@Test
 	public void TestWindowsXPLink() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.consolelink_winxp);
+		ShellLink link = createLink(ReadTestData.consolelink_winxp);
 
 		String expectedTarget = "C:\\linktest\\folder\\pause.bat";
 
@@ -368,7 +374,7 @@ public class ReadTests {
 
 	@Test
 	public void TestDesktopScreenLinkWin10() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.desktop_win10);
+		ShellLink link = createLink(ReadTestData.desktop_win10);
 		
 		String expectedTarget = "<Desktop>\\pause.bat";
 
@@ -381,7 +387,7 @@ public class ReadTests {
 
 	@Test
 	public void TestDesktopFolderLinkWin10() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.desktop_win10_folder);
+		ShellLink link = createLink(ReadTestData.desktop_win10_folder);
 		
 		String expectedTarget = "<Desktop>\\pause.bat";
 
@@ -394,7 +400,7 @@ public class ReadTests {
 
 	@Test
 	public void TestDesktopScreenLinkWinXP() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.desktop_winxp);
+		ShellLink link = createLink(ReadTestData.desktop_winxp);
 		
 		String expectedTarget = "<Desktop>\\pause.bat";
 		String absoluteTarget = "C:\\Documents and Settings\\admin\\\u0420\u0430\u0431\u043e\u0447\u0438\u0439 \u0441\u0442\u043e\u043b\\pause.bat";
@@ -409,7 +415,7 @@ public class ReadTests {
 
 	@Test
 	public void TestDesktopFolderLinkWinXP() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.desktop_winxp_folder);
+		ShellLink link = createLink(ReadTestData.desktop_winxp_folder);
 		
 		String expectedTarget = "C:\\Documents and Settings\\admin\\\u0420\u0430\u0431\u043e\u0447\u0438\u0439 \u0441\u0442\u043e\u043b\\pause.bat";
 
@@ -422,7 +428,7 @@ public class ReadTests {
 
 	@Test
 	public void TestDocumentsLinkWin10() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.documents_win10);
+		ShellLink link = createLink(ReadTestData.documents_win10);
 		
 		String expectedTarget = "<LocalDocuments>\\pause.bat";
 
@@ -435,7 +441,7 @@ public class ReadTests {
 
 	@Test
 	public void TestDocumentsLinkWinXP() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.documents_winxp);
+		ShellLink link = createLink(ReadTestData.documents_winxp);
 		
 		String expectedTarget = "<Documents>\\pause.bat";
 		String absoluteTarget = "C:\\Documents and Settings\\admin\\\u041c\u043e\u0438 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\pause.bat";
@@ -450,7 +456,7 @@ public class ReadTests {
 
 	@Test
 	public void TestDownloadsLinkWin10() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.downloads_win10);
+		ShellLink link = createLink(ReadTestData.downloads_win10);
 		
 		String expectedTarget = "<LocalDownloads>\\pause.bat";
 
@@ -463,7 +469,7 @@ public class ReadTests {
 
 	@Test
 	public void TestDownloadsLinkWinXP() throws IOException, ShellLinkException {
-		var link = createLink(ReadTestData.downloads_winxp);
+		ShellLink link = createLink(ReadTestData.downloads_winxp);
 		
 		String expectedTarget = "<Documents>\\Downloads\\pause.bat";
 		String absoluteTarget = "C:\\Documents and Settings\\admin\\\u041c\u043e\u0438 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\Downloads\\pause.bat";

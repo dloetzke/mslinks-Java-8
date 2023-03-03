@@ -18,12 +18,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.lang.reflect.Field;
 
 public class TestUtils {
 
 	public static void ExportLinkFiles(Path exportDir, Class<?> dataClass, boolean addExtension) throws IOException, IllegalArgumentException, IllegalAccessException {
 		Files.createDirectories(exportDir);
-		for (var field : dataClass.getDeclaredFields()) {
+		for (Field field : dataClass.getDeclaredFields()) {
 			if (field.getType() != byte[].class)
 				continue;
 				
@@ -35,7 +36,7 @@ public class TestUtils {
 	}
 
 	public static byte[] ByteArray(int... data) {
-		var bytes = new byte[data.length];
+		byte[] bytes = new byte[data.length];
 		for (int i = 0; i < data.length; ++i)
 			bytes[i] = (byte)data[i];
 		return bytes;

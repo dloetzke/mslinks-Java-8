@@ -36,8 +36,8 @@ public class WriteTests {
 	private static final String RELATIVE_PATH = "..\\..";
 
 	private ShellLinkHelper createLink() {
-		var link = new ShellLink();
-		var header = link.getHeader();
+		ShellLink link = new ShellLink();
+		ShellLinkHeader header = link.getHeader();
 
 		header.getAccessTime().clear();
 		header.getAccessTime().set(2000, 1, 1);
@@ -50,8 +50,8 @@ public class WriteTests {
 	}
 
 	private byte[] serializeLink(ShellLink link) throws IOException {
-		var stream = new ByteArrayOutputStream();
-		var writer = new ByteWriter(stream);
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		ByteWriter writer = new ByteWriter(stream);
 		writer.setLittleEndian();
 		link.serialize(writer);
 		return stream.toByteArray();
@@ -59,7 +59,7 @@ public class WriteTests {
 
 	@Test
 	public void TestBasicLink() throws ShellLinkException, IOException {
-		var link = createLink();
+		ShellLinkHelper link = createLink();
 		link.setLocalTarget(PROJECT_DRIVE, PROJECT_DIR + "\\pause.bat", Options.ForceTypeFile)
 			.getLink()
 				.setRelativePath(RELATIVE_PATH + "\\pause.bat")
@@ -70,7 +70,7 @@ public class WriteTests {
 
 	@Test
 	public void TestConsoleLink() throws ShellLinkException, IOException {
-		var link = createLink();
+		ShellLinkHelper link = createLink();
 		link.setLocalTarget(PROJECT_DRIVE, PROJECT_DIR + "\\pause.bat", Options.ForceTypeFile)
 			.getLink()
 				.setRelativePath(RELATIVE_PATH + "\\pause.bat")
@@ -90,7 +90,7 @@ public class WriteTests {
 
 	@Test
 	public void TestLinkIcon() throws ShellLinkException, IOException {
-		var link = createLink();
+		ShellLinkHelper link = createLink();
 		link.setLocalTarget(PROJECT_DRIVE, PROJECT_DIR + "\\pause.bat", Options.ForceTypeFile)
 			.getLink()
 				.setRelativePath(RELATIVE_PATH + "\\pause.bat")
@@ -104,7 +104,7 @@ public class WriteTests {
 
 	@Test
 	public void TestRunAsAdmin() throws ShellLinkException, IOException {
-		var link = createLink();
+		ShellLinkHelper link = createLink();
 		link.setLocalTarget(PROJECT_DRIVE, PROJECT_DIR + "\\pause.bat", Options.ForceTypeFile)
 			.getLink()
 				.setRelativePath(RELATIVE_PATH + "\\pause.bat")
@@ -116,7 +116,7 @@ public class WriteTests {
 
 	@Test
 	public void TestUnicodePath() throws ShellLinkException, IOException {
-		var link = createLink();
+		ShellLinkHelper link = createLink();
 		link.setLocalTarget(PROJECT_DRIVE, PROJECT_DIR + "\\\u03B1\u03B1\u03B1.bat", Options.ForceTypeFile)
 			.getLink()
 				.setRelativePath(RELATIVE_PATH + "\\pause.bat")
@@ -127,7 +127,7 @@ public class WriteTests {
 
 	@Test
 	public void TestNetworkSharePath() throws ShellLinkException, IOException {
-		var link = createLink();
+		ShellLinkHelper link = createLink();
 		link.setNetworkTarget("\\\\laptop\\share\\testfile.txt", Options.ForceTypeFile)
 			.getLink()
 				.setRelativePath(RELATIVE_PATH + "\\pause.bat")
@@ -138,7 +138,7 @@ public class WriteTests {
 
 	@Test
 	public void TestNetworkDrivePathAsLocalPath() throws ShellLinkException, IOException {
-		var link = createLink();
+		ShellLinkHelper link = createLink();
 		link.setLocalTarget("Z", "testfile.txt", Options.ForceTypeFile)
 			.getLink()
 				.setRelativePath(RELATIVE_PATH + "\\pause.bat")
@@ -149,7 +149,7 @@ public class WriteTests {
 
 	@Test
 	public void TestNetworkDrivePath() throws ShellLinkException, IOException {
-		var link = createLink();
+		ShellLinkHelper link = createLink();
 		// network mapped drive has both local and network path
 		link.setLocalTarget("Z", "testfile.txt", Options.ForceTypeFile)
 			.setNetworkTarget("\\\\laptop\\share\\testfile.txt", Options.ForceTypeFile)
@@ -163,7 +163,7 @@ public class WriteTests {
 
 	@Test
 	public void TestDirectoryLink() throws ShellLinkException, IOException {
-		var link = createLink();
+		ShellLinkHelper link = createLink();
 		link.setLocalTarget("C", "Windows", Options.ForceTypeDirectory)
 			.getLink()
 				.setRelativePath(RELATIVE_PATH + "\\pause.bat");
@@ -173,7 +173,7 @@ public class WriteTests {
 
 	@Test
 	public void TestNetworkShareUnicodePath() throws ShellLinkException, IOException {
-		var link = createLink();
+		ShellLinkHelper link = createLink();
 		link.setNetworkTarget("\\\\laptop\\\u03B1\u03B1\u03B1\\\u03B1\u03B1\u03B1.txt", Options.ForceTypeFile)
 			.getLink()
 				.setRelativePath(RELATIVE_PATH + "\\pause.bat")
@@ -184,7 +184,7 @@ public class WriteTests {
 
 	@Test
 	public void TestDesktopLink() throws ShellLinkException, IOException {
-		var link = createLink();
+		ShellLinkHelper link = createLink();
 		link.setSpecialFolderTarget(Registry.CLSID_DESKTOP, "pause.bat", Options.ForceTypeFile);
 
 		assertArrayEquals(WriteTestData.desktoplink, serializeLink(link.getLink()));
@@ -192,7 +192,7 @@ public class WriteTests {
 
 	@Test
 	public void TestDesktopLinkSimple() throws ShellLinkException, IOException {
-		var link = createLink();
+		ShellLinkHelper link = createLink();
 		link.setDesktopRelativeTarget("pause.bat", Options.ForceTypeFile);
 
 		assertArrayEquals(WriteTestData.desktoplink_simple, serializeLink(link.getLink()));
@@ -200,7 +200,7 @@ public class WriteTests {
 
 	@Test
 	public void TestDocumentsLink() throws ShellLinkException, IOException {
-		var link = createLink();
+		ShellLinkHelper link = createLink();
 		link.setSpecialFolderTarget(Registry.CLSID_DOCUMENTS, "pause.bat", Options.ForceTypeFile);
 
 		assertArrayEquals(WriteTestData.documentslink, serializeLink(link.getLink()));

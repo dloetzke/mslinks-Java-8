@@ -116,13 +116,13 @@ public class ShellLinkHelper {
 	 */
 	public ShellLinkHelper setLocalTarget(String drive, String absolutePath, Options options) throws ShellLinkException {
 		link.getHeader().getLinkFlags().setHasLinkTargetIDList();
-		var idList = link.createTargetIdList();
+		LinkTargetIDList idList = link.createTargetIdList();
 		// root is computer
 		idList.add(new ItemIDRoot().setClsid(Registry.CLSID_COMPUTER));
 
 		// drive
 		// windows usually creates TYPE_DRIVE_MISC here but TYPE_DRIVE_FIXED also works fine
-		var driveItem = new ItemIDDrive(ItemID.TYPE_DRIVE_MISC).setName(drive);
+		ItemIDDrive driveItem = new ItemIDDrive(ItemID.TYPE_DRIVE_MISC).setName(drive);
 		idList.add(driveItem);
 
 		// each segment of the path is directory
@@ -161,7 +161,7 @@ public class ShellLinkHelper {
 			throw new ShellLinkException("The type of target is not specified. You have to specify whether it is a file or a directory.");
 		
 		link.getHeader().getLinkFlags().setHasLinkTargetIDList();
-		var idList = link.createTargetIdList();
+		LinkTargetIDList idList = link.createTargetIdList();
 		// although later systems use ItemIDRoot(computer) + ItemIDRegFolder(root clsid) pair, always set root clsid as ItemIDRoot for simplicity
 		idList.add(new ItemIDRoot().setClsid(root));
 
@@ -192,7 +192,7 @@ public class ShellLinkHelper {
 			throw new ShellLinkException("The type of target is not specified. You have to specify whether it is a file or a directory.");
 		
 		link.getHeader().getLinkFlags().setHasLinkTargetIDList();
-		var idList = link.createTargetIdList();
+		LinkTargetIDList idList = link.createTargetIdList();
 
 		// no root item here
 
@@ -257,7 +257,7 @@ public class ShellLinkHelper {
 	public static ShellLinkHelper createLink(String target, String linkpath) throws IOException, ShellLinkException {
 		target = resolveEnvVariables(target);
 		
-		var helper = new ShellLinkHelper(new ShellLink());
+		ShellLinkHelper helper = new ShellLinkHelper(new ShellLink());
 		if (target.startsWith("\\\\")) {
 			helper.setNetworkTarget(target);
 		} else {
@@ -272,7 +272,7 @@ public class ShellLinkHelper {
 	}
 
 	public static String resolveEnvVariables(String path) {
-		for (var i : env.entrySet()) {
+		for (Map.Entry<String, String> i : env.entrySet()) {
 			String p = Pattern.quote(i.getKey());
 			String r = i.getValue().replace("\\", "\\\\");
 			path = Pattern.compile("%"+p+"%", Pattern.CASE_INSENSITIVE).matcher(path).replaceAll(r);

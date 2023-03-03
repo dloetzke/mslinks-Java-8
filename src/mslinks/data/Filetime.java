@@ -53,7 +53,7 @@ public class Filetime extends GregorianCalendar implements Serializable {
 		if (!super.equals(o))
 			return false;
 
-		var obj = (Filetime)o;
+		Filetime obj = (Filetime)o;
 		return residue == obj.residue;
 	}
 

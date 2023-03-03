@@ -38,15 +38,15 @@ import mslinks.extra.VistaIDList;
 
 public class ShellLink {
 
-	public static final String VERSION = "1.1.0";
+	public static final String VERSION = "1.1.0-j8";
 	
-	private static HashMap<Integer, Class<? extends Serializable>> extraTypes = new HashMap<>(Map.of(
-		ConsoleData.signature, ConsoleData.class,
-		ConsoleFEData.signature, ConsoleFEData.class,
-		Tracker.signature, Tracker.class,
-		VistaIDList.signature, VistaIDList.class,
-		EnvironmentVariable.signature, EnvironmentVariable.class
-	));
+	private static HashMap<Integer, Class<? extends Serializable>> extraTypes = new HashMap<Integer, Class<? extends Serializable>>() {{
+		put(ConsoleData.signature, ConsoleData.class);
+		put(ConsoleFEData.signature, ConsoleFEData.class);
+		put(Tracker.signature, Tracker.class);
+		put(VistaIDList.signature, VistaIDList.class);
+		put(EnvironmentVariable.signature, EnvironmentVariable.class);
+	}};
 	
 	
 	private ShellLinkHeader header;
@@ -80,16 +80,16 @@ public class ShellLink {
 	}
 	
 	public ShellLink(InputStream in) throws IOException, ShellLinkException {
-		try (var reader = new ByteReader(in)) {
+		try (ByteReader reader = new ByteReader(in)) {
 			parse(reader);
 		}
 	}
 
-	public ShellLink(ByteReader reader) throws IOException, ShellLinkException {
+	/*public ShellLink(ByteReader reader) throws IOException, ShellLinkException {
 		try (reader) {
 			parse(reader);
 		}
-	}
+	}*/
 	
 	private void parse(ByteReader data) throws ShellLinkException, IOException {
 		header = new ShellLinkHeader(data);
@@ -127,7 +127,7 @@ public class ShellLink {
 	}
 
 	public void serialize(OutputStream out) throws IOException {
-		var bw = new ByteWriter(out);
+		ByteWriter bw = new ByteWriter(out);
 		serialize(bw);
 		out.close();
 	}
@@ -312,7 +312,7 @@ public class ShellLink {
 		if (linkFileSource != null && header.getLinkFlags().hasRelativePath() && relativePath != null) 
 			return linkFileSource.resolveSibling(relativePath).normalize().toString();
 
-		var envBlock = (EnvironmentVariable)extra.get(EnvironmentVariable.signature);
+		EnvironmentVariable envBlock = (EnvironmentVariable)extra.get(EnvironmentVariable.signature);
 		if (envBlock != null && !envBlock.getVariable().isEmpty())
 			return envBlock.getVariable();
 
@@ -340,7 +340,7 @@ public class ShellLink {
 	/**
 	 * @Deprecated Use new ShellLinkHelper API: {@link ShellLinkHelper#saveTo(String path) }
 	 */
-	@Deprecated(since = "1.0.7", forRemoval = true)
+	@Deprecated
 	public ShellLink saveTo(String path) throws IOException {
 		new ShellLinkHelper(this).saveTo(path);
 		return this;
@@ -351,13 +351,13 @@ public class ShellLink {
 	 * Environment variables are accepted but resolved here and aren't kept in the link.
 	 * @Deprecated Use new ShellLinkHelper API: {@link ShellLinkHelper#setNetworkTarget(String path)} or {@link ShellLinkHelper#setLocalTarget(String drive, String absolutePath)}
 	 */
-	@Deprecated(since = "1.0.7", forRemoval = true)
+	@Deprecated
 	public ShellLink setTarget(String target) {
 		target = ShellLinkHelper.resolveEnvVariables(target);
 		String targetAbsPath = Paths.get(target).toAbsolutePath().toString();
 
 		try {
-			var helper = new ShellLinkHelper(this);
+			ShellLinkHelper helper = new ShellLinkHelper(this);
 			if (targetAbsPath.startsWith("\\\\")) {
 				helper.setNetworkTarget(targetAbsPath);
 			} else {
@@ -373,7 +373,7 @@ public class ShellLink {
 	/**
 	 * @Deprecated Use new ShellLinkHelper API: {@link ShellLinkHelper#setNetworkTarget(String path)} or {@link ShellLinkHelper#setLocalTarget(String drive, String absolutePath)}
 	 */
-	@Deprecated(since = "1.0.7", forRemoval = true)
+	@Deprecated
 	public static ShellLink createLink(String target) {
 		ShellLink sl = new ShellLink();
 		sl.setTarget( target );
@@ -383,7 +383,7 @@ public class ShellLink {
 	/**
 	 * @Deprecated Use new ShellLinkHelper API: {@link ShellLinkHelper#createLink(String target, String linkpath)}
 	 */
-	@Deprecated(since = "1.0.7", forRemoval = true)
+	@Deprecated
 	public static ShellLink createLink(String target, String linkpath) throws IOException {
 		return createLink(target).saveTo(linkpath);
 	}

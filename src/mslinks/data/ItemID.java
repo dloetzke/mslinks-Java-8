@@ -113,7 +113,7 @@ public class ItemID implements Serializable {
 	/**
 	 * @Deprecated Instances of this class should not be created directly. The class is going to be abstract
 	 */
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	public ItemID(int flags) {
 		this.typeFlags = flags;
 
@@ -215,40 +215,40 @@ public class ItemID implements Serializable {
 	////////////// Deprecated old API ////////////////////
 	//////////////////////////////////////////////////////
 
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	public static final int TYPE_UNKNOWN = 0;
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	public static final int TYPE_FILE_OLD      = GROUP_FS       | TYPE_FS_UNICODE | TYPE_FS_FILE;
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	public static final int TYPE_DIRECTORY_OLD = GROUP_FS       | TYPE_FS_UNICODE | TYPE_FS_DIRECTORY;
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	public static final int TYPE_FILE          = GROUP_FS       | TYPE_FS_FILE;
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	public static final int TYPE_DIRECTORY     = GROUP_FS       | TYPE_FS_DIRECTORY;
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	public static final int TYPE_DRIVE_OLD     = GROUP_COMPUTER | TYPE_DRIVE_FIXED;
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	public static final int TYPE_DRIVE         = GROUP_COMPUTER | TYPE_DRIVE_MISC;
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	public static final int TYPE_CLSID         = GROUP_ROOT     | TYPE_ROOT_REGITEM;
 
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	private ItemID internalItemId;
 
 	/**
 	 * @Deprecated Instances of this class should not be created directly. The class is going to be abstract
 	 */
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	public ItemID() {
 	}
 	
 	/**
 	 * @Deprecated Instances of this class should not be created directly. The class is going to be abstract
 	 */
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	public ItemID(byte[] d) throws IOException, ShellLinkException {
-		var br = new ByteReader(new ByteArrayInputStream(d));
-		var flags = br.read();
+		ByteReader br = new ByteReader(new ByteArrayInputStream(d));
+		int flags = br.read();
 		internalItemId = ItemID.createItem(flags);
 		internalItemId.load(br, d.length - 1);
 	}
@@ -256,9 +256,9 @@ public class ItemID implements Serializable {
 	/**
 	 * @Deprecated Instances of this class should not be created directly. The class is going to be abstract
 	 */
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	public ItemID(ByteReader br, int maxSize) throws IOException, ShellLinkException {
-		var flags = br.read();
+		int flags = br.read();
 		internalItemId = ItemID.createItem(flags);
 		internalItemId.load(br, maxSize - 1);
 	}
@@ -266,7 +266,7 @@ public class ItemID implements Serializable {
 	/**
 	 * @Deprecated Use {@link ItemIDDrive} or {@link ItemIDFS}
 	 */
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	public String getName() {
 		if (internalItemId instanceof ItemIDDrive) {
 			return ((ItemIDDrive)internalItemId).getName();
@@ -280,7 +280,7 @@ public class ItemID implements Serializable {
 	/**
 	 * @Deprecated Use {@link ItemIDDrive} or {@link ItemIDFS}
 	 */
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	public ItemID setName(String s) throws ShellLinkException {
 		if (internalItemId instanceof ItemIDDrive) {
 			((ItemIDDrive)internalItemId).setName(s);
@@ -295,7 +295,7 @@ public class ItemID implements Serializable {
 	/**
 	 * @Deprecated Use {@link ItemIDFS}
 	 */
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	public int getSize() {
 		if (internalItemId instanceof ItemIDFS) {
 			return ((ItemIDFS)internalItemId).getSize();
@@ -306,7 +306,7 @@ public class ItemID implements Serializable {
 	/**
 	 * @Deprecated Use {@link ItemIDFS}
 	 */
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	public ItemID setSize(int s) throws ShellLinkException {
 		if (internalItemId instanceof ItemIDFS) {
 			((ItemIDFS)internalItemId).setSize(s);
@@ -318,7 +318,7 @@ public class ItemID implements Serializable {
 	/**
 	 * @Deprecated Use {@link #getTypeFlags()}
 	 */
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	public int getType() {
 		return getTypeFlags();
 	}
@@ -328,7 +328,7 @@ public class ItemID implements Serializable {
 	 * of an appropriate class extending this one and use {@code setTypeFlags(int flags)} only to set
 	 * type-specific flags corresponding to the {@link #ID_TYPE_INGROUPMASK}
 	 */
-	@Deprecated(since = "1.0.9", forRemoval = true)
+	@Deprecated
 	public ItemID setType(int t) throws ShellLinkException {
 		if (t == TYPE_CLSID) {
 			internalItemId = new ItemIDRoot().setClsid(Registry.CLSID_COMPUTER);
@@ -340,7 +340,7 @@ public class ItemID implements Serializable {
 				((ItemIDFS)internalItemId).setTypeFlags(t & ItemID.ID_TYPE_INGROUPMASK);
 			}
 			else if (internalItemId instanceof ItemIDDrive) {
-				var driveId = (ItemIDDrive)internalItemId;
+				ItemIDDrive driveId = (ItemIDDrive)internalItemId;
 				internalItemId = new ItemIDFS(t).setName(driveId.getName());
 			}
 			else if (internalItemId == null) {
@@ -354,7 +354,7 @@ public class ItemID implements Serializable {
 				((ItemIDDrive)internalItemId).setTypeFlags(t & ItemID.ID_TYPE_INGROUPMASK);
 			}
 			else if (internalItemId instanceof ItemIDFS) {
-				var fsId = (ItemIDFS)internalItemId;
+				ItemIDFS fsId = (ItemIDFS)internalItemId;
 				internalItemId = new ItemIDDrive(t).setName(fsId.getName());
 			}
 			else if (internalItemId == null) {
